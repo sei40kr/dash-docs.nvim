@@ -1,5 +1,11 @@
-{ dash-docs-nvim, mkShell, neovim, sqlite, vimPlugins }:
+{ dash-docs-nvim, mkShell, neovim, sqlite, stdenv, vimPlugins }:
 
+let
+  libExt =
+    if stdenv.isLinux then "so"
+    else if stdenv.isDarwin then "dylib"
+    else throw "Unsupported platform";
+in
 mkShell {
   name = "dash-docs.nvim-dev-shell";
 
@@ -10,7 +16,7 @@ mkShell {
       configure = {
         customRC = ''
           lua <<EOF
-          vim.g.sqlite_clib_path = "${sqlite.out}/lib/libsqlite3.dylib";
+          vim.g.sqlite_clib_path = "${sqlite.out}/lib/libsqlite3.${libExt}";
           EOF
         '';
         packages.myVimPackage.start = [
